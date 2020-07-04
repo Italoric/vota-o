@@ -1,21 +1,42 @@
 package view;
 
-
-import source.CandTable;
+import conexão.CandidatoDAO;
+import java.awt.Image;
+import java.io.File;
+import java.util.ArrayList;
+import javax.swing.ImageIcon;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
 import model.Candidato;
 import javax.swing.JOptionPane;
-
-
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableRowSorter;
+import model.Sonumero;
 
 public class tablemodel extends javax.swing.JFrame {
 
-    CandTable tableModel1 = new CandTable();
-    tablemodel t1;
-    public tablemodel(tablemodel t1) {
-        this.t1 = t1;
+    public tablemodel() {
+
         initComponents();
-        jtCandidatos.setModel(tableModel1);
-        txtNumero.setEnabled(false);
+        txtNumero.setDocument(new Sonumero());
+        DefaultTableModel modelo = (DefaultTableModel) jtCandidatos.getModel();
+        jtCandidatos.setRowSorter(new TableRowSorter(modelo));
+        readTable();
+    }
+
+    public void readTable() {
+        DefaultTableModel modelo = (DefaultTableModel) jtCandidatos.getModel();
+        modelo.setNumRows(0);
+        CandidatoDAO cdao = new CandidatoDAO();
+
+        for (Candidato p : cdao.listar()) {
+            modelo.addRow(new Object[]{
+                p.getName(),
+                p.getSetor(),
+                p.getNumber(),
+                p.getCaminho()
+            });
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -33,15 +54,20 @@ public class tablemodel extends javax.swing.JFrame {
         jBAlterar = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         jtCandidatos = new javax.swing.JTable();
-        jButton1 = new javax.swing.JButton();
+        jbVotacao = new javax.swing.JButton();
+        jlImagem = new javax.swing.JLabel();
+        txtCaminho = new javax.swing.JTextField();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setTitle("CSIRC");
 
         jLabel1.setText("Candidato:");
 
         jLabel2.setText("Setor:");
 
         jLabel3.setText("Número:");
+
+        txtNumero.setCursor(new java.awt.Cursor(java.awt.Cursor.TEXT_CURSOR));
 
         jBAdd.setText("Adicionar");
         jBAdd.addActionListener(new java.awt.event.ActionListener() {
@@ -72,15 +98,38 @@ public class tablemodel extends javax.swing.JFrame {
                 {null, null, null, null}
             },
             new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
+                "Candidatos", "Setor", "Número", "Imagem"
             }
-        ));
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        jtCandidatos.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                jtCandidatosKeyReleased(evt);
+            }
+        });
         jScrollPane1.setViewportView(jtCandidatos);
 
-        jButton1.setText("votação");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        jbVotacao.setText("votação");
+        jbVotacao.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                jbVotacaoActionPerformed(evt);
+            }
+        });
+
+        jlImagem.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
+        jlImagem.setText("Adicionar Imagem");
+        jlImagem.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        jlImagem.setVerticalTextPosition(javax.swing.SwingConstants.TOP);
+        jlImagem.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jlImagemMouseClicked(evt);
             }
         });
 
@@ -93,33 +142,31 @@ public class tablemodel extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 107, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(txtCandidato, javax.swing.GroupLayout.PREFERRED_SIZE, 168, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(61, 61, 61)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 84, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(txtSetor, javax.swing.GroupLayout.PREFERRED_SIZE, 168, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jBAdd, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(57, 57, 57)
-                        .addComponent(jBExcluir, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(56, 56, 56)
-                        .addComponent(jBAlterar, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 67, Short.MAX_VALUE)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(txtNumero, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(68, 68, 68))
-                    .addGroup(layout.createSequentialGroup()
+                            .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 107, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(txtCandidato, javax.swing.GroupLayout.PREFERRED_SIZE, 168, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(61, 61, 61)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 84, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(txtSetor, javax.swing.GroupLayout.PREFERRED_SIZE, 168, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jBAdd, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(57, 57, 57)
+                                .addComponent(jBExcluir, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(56, 56, 56)
+                                .addComponent(jBAlterar, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)))
                         .addGap(49, 49, 49)
-                        .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jScrollPane1)
-                .addContainerGap())
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(txtNumero, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jbVotacao, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addComponent(txtCaminho))
+                .addGap(18, 18, 18)
+                .addComponent(jlImagem, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(48, 48, 48))
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -139,111 +186,177 @@ public class tablemodel extends javax.swing.JFrame {
                     .addComponent(jBAdd)
                     .addComponent(jBExcluir)
                     .addComponent(jBAlterar)
-                    .addComponent(jButton1))
-                .addGap(18, 18, 18)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 300, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(jbVotacao))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 44, Short.MAX_VALUE)
+                .addComponent(txtCaminho, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 386, javax.swing.GroupLayout.PREFERRED_SIZE))
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jlImagem, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
 
-    
-    
     private void jBAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBAddActionPerformed
-        
-        if(txtCandidato.getText().isEmpty()){
+
+        if (txtCandidato.getText().isEmpty()) {
             JOptionPane.showMessageDialog(null, ("Por favaor preencha o campo Candidato!"));
             txtCandidato.requestFocusInWindow();
-        }else{
-        if(txtSetor.getText().isEmpty()){
-            JOptionPane.showMessageDialog(null, ("Por favaor preencha o campo setor!"));
-            txtSetor.requestFocusInWindow();
-        }else{
-        
-        Candidato p = new Candidato();
-        int a = 1;
-        p.setNumber(a);
-        String b = "" + a;
-                for (int i = 1; i <= tableModel1.getRowCount() ; i++) {
-                a = i + 1;
-                b = "" + a;
-                p.setNumber(a);
-                txtNumero.setText(b);
+        } else {
+            if (txtSetor.getText().isEmpty()) {
+                JOptionPane.showMessageDialog(null, ("Por favaor preencha o campo setor!"));
+                txtSetor.requestFocusInWindow();
+            } else {
+                if (txtNumero.getText().isEmpty()) {
+                    JOptionPane.showMessageDialog(null, ("Por favaor preencha o campo número!"));
+                    txtNumero.requestFocusInWindow();
+                } else {
+
+                    CandidatoDAO candao = new CandidatoDAO();
+                    Candidato p = new Candidato();
+
+                    p.setName(txtCandidato.getText());
+                    p.setSetor(txtSetor.getText());
+                    p.setCaminho(txtCaminho.getText());
+                    p.setNumber(Integer.parseInt(txtNumero.getText()));
+                    p.setVoto(0);
+
+                    candao.inserirCandidato(p);
+                    readTable();
+
+                    txtCandidato.setText("");
+                    txtSetor.setText("");
+                    txtCaminho.setText("");
+                    txtNumero.setText("");
+                    jlImagem.setIcon(null);
+                    txtCandidato.requestFocusInWindow();
+
+                }
             }
-                       
-        p.setName(txtCandidato.getText());
-        p.setSetor(txtSetor.getText());
-        
-        tableModel1.addRow(p);
-        
-        txtCandidato.setText("");
-        txtSetor.setText("");
-        
-        txtCandidato.requestFocusInWindow();
-        }}
+        }
     }//GEN-LAST:event_jBAddActionPerformed
 
     private void jBExcluirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBExcluirActionPerformed
-        
-        if (jtCandidatos.getSelectedRow() != -1) {
-            tableModel1.removeRow(jtCandidatos.getSelectedRow());
-        }
-        String c = "" + tableModel1.getRowCount();
-        txtNumero.setText(c);
-        txtCandidato.requestFocusInWindow();
+                    if (jtCandidatos.getSelectedRow() != -1) {
+                    CandidatoDAO candao = new CandidatoDAO();
+                    Candidato p = new Candidato();
+
+                    p.setNumber((int)jtCandidatos.getValueAt(jtCandidatos.getSelectedRow(), 2));
+
+                    candao.excluirCandidato(p);
+
+                    txtCandidato.setText("");
+                    txtSetor.setText("");
+                    txtCaminho.setText("");
+                    txtNumero.setText("");
+                    jlImagem.setIcon(null);
+                    txtCandidato.requestFocusInWindow();
+
+                    readTable();
+                    }
+
     }//GEN-LAST:event_jBExcluirActionPerformed
 
     private void jBAlterarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBAlterarActionPerformed
-        
-        if(txtCandidato.getText().isEmpty()){
+
+        if (txtCandidato.getText().isEmpty()) {
             JOptionPane.showMessageDialog(null, ("Por favaor preencha o campo Candidato!"));
             txtCandidato.requestFocusInWindow();
-        }else{
-        if(txtSetor.getText().isEmpty()){
-            JOptionPane.showMessageDialog(null, ("Por favaor preencha o campo setor!"));
-            txtSetor.requestFocusInWindow();
-        }else{
-        if(txtNumero.getText().isEmpty()){
-            JOptionPane.showMessageDialog(null, ("Por favaor preencha o campo Número!"));
-            txtNumero.requestFocusInWindow();
-        }else{     
-        
-        if (jtCandidatos.getSelectedRow() != -1) {
-            tableModel1.setValueAt(txtCandidato.getText(), jtCandidatos.getSelectedRow(), 0);
-            tableModel1.setValueAt(txtSetor.getText(), jtCandidatos.getSelectedRow(), 1);
-            tableModel1.setValueAt(txtNumero.getText(), jtCandidatos.getSelectedRow(), 2);
-            
-            txtCandidato.setText("");
-            String c = "" + tableModel1.getRowCount();
-            txtNumero.setText(c);
-            txtSetor.setText("");
-            
-            txtCandidato.requestFocusInWindow();
-        }}}}
-        
-        
-        
+        } else {
+            if (txtSetor.getText().isEmpty()) {
+                JOptionPane.showMessageDialog(null, ("Por favaor preencha o campo setor!"));
+                txtSetor.requestFocusInWindow();
+            } else {
+                if (txtNumero.getText().isEmpty()) {
+                    JOptionPane.showMessageDialog(null, ("Por favaor preencha o campo Número!"));
+                    txtNumero.requestFocusInWindow();
+                } else {
+
+                    if (jtCandidatos.getSelectedRow() != -1) {
+
+                        CandidatoDAO candao = new CandidatoDAO();
+                        Candidato p = new Candidato();
+
+                        p.setName(txtCandidato.getText());
+                        p.setSetor(txtSetor.getText());
+                        p.setCaminho(txtCaminho.getText());
+                        p.setNumber(Integer.parseInt(txtNumero.getText()));
+                        p.setVoto(0);
+                        //((int)jtCandidatos.setValueAt(txtNumero.getText(), 0));
+
+                        candao.alterarCandidato(p);
+
+                        txtCandidato.setText("");
+                        txtSetor.setText("");
+                        txtCaminho.setText("");
+                        txtNumero.setText("");
+                        jlImagem.setIcon(null);
+                        txtCandidato.requestFocusInWindow();
+
+                        readTable();
+
+                    }
+                }
+            }
+        }
     }//GEN-LAST:event_jBAlterarActionPerformed
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    private void jbVotacaoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbVotacaoActionPerformed
         Votacao v1 = new Votacao();
+        v1.setLocationRelativeTo(null);
         v1.setVisible(true);
-        this.setVisible(false);
-    }//GEN-LAST:event_jButton1ActionPerformed
+        this.dispose();
+    }//GEN-LAST:event_jbVotacaoActionPerformed
+
+    private void jtCandidatosKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jtCandidatosKeyReleased
+        if (jtCandidatos.getSelectedRow() != -1) {
+
+            txtCandidato.setText(jtCandidatos.getValueAt(jtCandidatos.getSelectedRow(), 0).toString());
+            txtSetor.setText(jtCandidatos.getValueAt(jtCandidatos.getSelectedRow(), 1).toString());
+            txtNumero.setText(jtCandidatos.getValueAt(jtCandidatos.getSelectedRow(), 2).toString());
+            txtCaminho.setText(jtCandidatos.getValueAt(jtCandidatos.getSelectedRow(), 3).toString());
+            String t = txtCaminho.getText();
+            ImageIcon imagem = new ImageIcon(t);
+            jlImagem.setIcon(new ImageIcon(imagem.getImage().getScaledInstance(jlImagem.getWidth(), jlImagem.getHeight(), Image.SCALE_DEFAULT)));
+
+        }
+    }//GEN-LAST:event_jtCandidatosKeyReleased
+
+    private void jlImagemMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jlImagemMouseClicked
+        JFileChooser arquivo = new JFileChooser();
+        arquivo.setDialogTitle("Selecione uma imagem!");
+        arquivo.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        
+        int opt = arquivo.showOpenDialog(this);
+        if (opt == JFileChooser.APPROVE_OPTION) {
+            File file = new File("CAMINHO");
+            file = arquivo.getSelectedFile();
+            
+            String filename = file.getAbsolutePath();
+            txtCaminho.setText(filename);
+            
+            ImageIcon imagem = new ImageIcon(arquivo.getSelectedFile().getPath());
+            jlImagem.setIcon(new ImageIcon(imagem.getImage().getScaledInstance(jlImagem.getWidth(), jlImagem.getHeight(), Image.SCALE_DEFAULT)));
+        }
+    }//GEN-LAST:event_jlImagemMouseClicked
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jBAdd;
     private javax.swing.JButton jBAlterar;
     private javax.swing.JButton jBExcluir;
-    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JButton jbVotacao;
+    private javax.swing.JLabel jlImagem;
     private javax.swing.JTable jtCandidatos;
+    private javax.swing.JTextField txtCaminho;
     private javax.swing.JTextField txtCandidato;
     private javax.swing.JTextField txtNumero;
     private javax.swing.JTextField txtSetor;
